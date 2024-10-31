@@ -1,0 +1,17 @@
+name: Build RPMs
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Build RPMs
+        run: |
+          docker build -t slurm-rpms:rocky9 .
+          docker run --rm -v $PWD:/build slurm-rpms:rocky9 tar -cf /build/rocky9-rpms.tar.gz /root/rpmbuild/RPMS/x86_64
+          tar -xf rocky9-rpms.tar.gz --strip-components=4
+          ls *.rpm
