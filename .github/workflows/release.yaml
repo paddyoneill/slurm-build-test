@@ -1,0 +1,32 @@
+name: Release packages
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build RPMs
+        uses: docker/build-push-action@v6
+        with:
+          file: Dockerfile
+          push: false
+          load: true
+          tags: slurm-packages:rocky9
+      - name: Copy RPMs from container
+        uses: addnab/docker-run-action@v3
+        with:
+          image: slurm-packages:rocky9
+          options: "-v ${{ github.workspace }}:/build"
+          run: "bash -c 'cp /root/rpmbuild/RPMS/x86_64/*.rpm /build'"
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.workspace }}/*.rpm
