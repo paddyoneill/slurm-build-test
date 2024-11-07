@@ -3,6 +3,7 @@ FROM rockylinux/rockylinux:${ROCKY_VERSION}
 
 WORKDIR /build
 COPY rocm.repo /etc/yum.repos.d/rocm.repo
+COPY rpmmacros /root/.rpmmacros
 
 ARG SLURM_VERSION=24.05.4
 
@@ -13,6 +14,7 @@ RUN dnf install -y \
         bzip2-devel \
         openssl-devel \
         hwloc-devel \
+        numactl-devel \
         pmix-devel \
         procps \
         rpm-build \
