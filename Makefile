@@ -5,8 +5,8 @@ SLURM_MD5SUM ?= 9e3c2bf7b7c0f1a2951881573b3f00d2
 SLURM_TARBALL ?= slurm-$(SLURM_VERSION).tar.bz2
 SLURM_SOURCE ?= https://download.schedmd.com/slurm/$(SLURM_TARBALL)
 
-HOST_DIR ?= /data
-BUILD_DIR ?= /build
+#HOST_DIR ?= /data
+BUILD_DIR ?= ./build
 
 .PHONY: default
 default:
@@ -46,4 +46,4 @@ ubuntu-build: fetch-source
 
 .PHONY: ubuntu-release
 ubuntu-release: ubuntu-build
-	@find $(BUILD_DIR) -maxdepth 1 -name '*.deb' -printf '%f\n' | xargs tar -C $(BUILD_DIR) -cf $(HOST_DIR)/slurm-$(SLURM_VERSION)-ubuntu-$$(lsb_release -sr 2>/dev/null).tar.gz
+	@find $(BUILD_DIR) -maxdepth 1 -name '*.deb' -printf '%f\n' | xargs tar -C $(BUILD_DIR) -cf slurm-$(SLURM_VERSION)-ubuntu-$$(lsb_release -sr 2>/dev/null).tar.gz

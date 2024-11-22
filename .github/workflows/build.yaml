@@ -1,28 +1,29 @@
-name: Build RPMs
-
+name: Build Ubuntu Packages
 on:
   push:
-
+  workflow_call:
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-          platform:
-            - ubuntu:22.04
-            - ubuntu:24.04
+          version:
+            - 22.04
+            - 24.04
     container:
-      image: ${{ matrix.platform }}
+      image: "ubuntu:${{ matrix.version }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: debug
+        run: id
       - name: Build Packages
-        uses: addnab/docker-run-action@v3
+        run: |
+          id
+          apt update && apt -y install curl make
+          make ubuntu-build
+      - name: Create build artifact
+        uses: actions/upload-artifact@master
         with:
-          image: "${{ matrix.platform }}"
-          options: "-v ${{ github.workspace }}:/src"
-          run: |
-            apt update && apt -y install curl make
-            make -C /src ubuntu-build
+          name: build-dir
+          path: build/
