@@ -13,11 +13,10 @@ default:
 	@echo "No target specified"
 
 .PHONY: prep-host
-prep-host: $(HOST_DIR)/$(SLURM_TARBALL)
-$(HOST_DIR)/$(SLURM_TARBALL):
-	@mkdir -p $(HOST_DIR)
-	@curl -L $(SLURM_SOURCE) -o $(HOST_DIR)/$(SLURM_TARBALL)
-	@if [[ $$(md5sum $(HOST_DIR)/$(SLURM_TARBALL) | awk '{print $$1}') != $(SLURM_MD5SUM) ]]; then \
+prep-host: $(SLURM_TARBALL)
+$(SLURM_TARBALL):
+	@curl -L $(SLURM_SOURCE) -o $(SLURM_TARBALL)
+	@if [[ $$(md5sum $(SLURM_TARBALL) | awk '{print $$1}') != $(SLURM_MD5SUM) ]]; then \
 		echo "$(SLURM_TARBALL) md5sum does not match expected value: $(SLURM_MD5SUM)"; \
 	exit 1; \
 	fi
