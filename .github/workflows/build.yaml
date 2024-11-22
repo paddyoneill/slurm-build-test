@@ -25,4 +25,4 @@ jobs:
           options: "-v ${{ github.workspace }}:/src"
           run: |
             apt update && apt -y install curl make
-            make ubuntu-build
+            make -C /src ubuntu-build
