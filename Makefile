@@ -5,35 +5,31 @@ SLURM_MD5SUM ?= 9e3c2bf7b7c0f1a2951881573b3f00d2
 SLURM_TARBALL ?= slurm-$(SLURM_VERSION).tar.bz2
 SLURM_SOURCE ?= https://download.schedmd.com/slurm/$(SLURM_TARBALL)
 
-HOST_DIR ?= /src
+HOST_DIR ?= /data
 BUILD_DIR ?= /build
 
 .PHONY: default
 default:
 	@echo "No target specified"
 
-.PHONY: prep-host
-prep-host: $(SLURM_TARBALL)
+.PHONY: fetch-source
+fetch-source: $(SLURM_TARBALL)
 $(SLURM_TARBALL):
-	@curl -L $(SLURM_SOURCE) -o $(SLURM_TARBALL)
-	@if [[ $$(md5sum $(SLURM_TARBALL) | awk '{print $$1}') != $(SLURM_MD5SUM) ]]; then \
+	@mkdir -p $(BUILD_DIR)
+	@curl -L $(SLURM_SOURCE) -o $(BUILD_DIR)/$(SLURM_TARBALL)
+	@if [[ $$(md5sum $(BUILD_DIR)/$(SLURM_TARBALL) | awk '{print $$1}') != $(SLURM_MD5SUM) ]]; then \
 		echo "$(SLURM_TARBALL) md5sum does not match expected value: $(SLURM_MD5SUM)"; \
 	exit 1; \
 	fi
 
-.PHONY: common
-common:
-	@mkdir -p $(BUILD_DIR)
-	@cp $(HOST_DIR)/$(SLURM_TARBALL) $(BUILD_DIR)/
-
 .PHONY: rocky-build
-rocky-build: common
+rocky-build: fetch-source
 
 .PHONY: rocky-release
-rocky-release: common
+rocky-release: rocky-build
 
 .PHONY: ubuntu-build
-ubuntu-build: common
+ubuntu-build: fetch-source
 	@apt -y update && apt -y upgrade
 	@ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 	@DEBIAN_FRONTEND=noninteractive apt -y install tzdata

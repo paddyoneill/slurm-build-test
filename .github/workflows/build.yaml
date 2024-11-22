@@ -11,16 +11,18 @@ jobs:
           platform:
             - ubuntu:22.04
             - ubuntu:24.04
+    container:
+      image: ${{ matrix.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Download Slurm source
-        run: "bash -c 'make prep-host'"
       - name: Build Packages
         uses: addnab/docker-run-action@v3
         with:
           image: "${{ matrix.platform }}"
           options: "-v ${{ github.workspace }}:/src"
-          run: "bash -c 'make build-ubuntu'"
+          run: |
+            apt update && apt -y install curl make
+            make build-ubuntu
