@@ -6,29 +6,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          platform:
+            - ubuntu:2204
+            - ubuntu:2404
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Build RPMs
-        uses: docker/build-push-action@v6
-        with:
-          file: Dockerfile
-          push: false
-          load: true
-          tags: slurm-packages:rocky9
-      - name: Create tarball of RPMs
+      - name: Download Slurm source
+        run: "bash -c 'make prep-host'"
+      - name: Build Packages
         uses: addnab/docker-run-action@v3
         with:
-          image: slurm-packages:rocky9
-          options: "-v ${{ github.workspace }}:/build"
-          run: "bash -c 'cp /root/rpmbuild/RPMS/x86_64/*.rpm /build'"
-      - name: Confirm RPMs are copied
-        run: ls -l
-        #- name: Build RPMs
-        #  run: |
-        #    docker build -t slurm-rpms:rocky9 .
-        #    docker run --rm -v $PWD:/build slurm-rpms:rocky9 tar -cf /build/rocky9-rpms.tar.gz /root/rpmbuild/RPMS/x86_64
-        #    tar -xf rocky9-rpms.tar.gz --strip-components=4
-        #    ls *.rpm
+          image: "${{ matrix.platform }}"
+          options: "-v ${{ github.workspace }}:/src"
+          run: "bash -c 'make build-ubuntu'"
