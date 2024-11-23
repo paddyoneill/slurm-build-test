@@ -6,7 +6,7 @@ SLURM_TARBALL ?= slurm-$(SLURM_VERSION).tar.bz2
 SLURM_SOURCE ?= https://download.schedmd.com/slurm/$(SLURM_TARBALL)
 
 #HOST_DIR ?= /data
-BUILD_DIR ?= ./build
+BUILD_DIR ?= /build
 
 .PHONY: default
 default:

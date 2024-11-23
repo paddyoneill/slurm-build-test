@@ -25,5 +25,5 @@ jobs:
       - name: Create build artifact
         uses: actions/upload-artifact@master
         with:
-          name: build-dir
-          path: build/
+          name: ubuntu-debs-${{ matrix.version }}
+          path: /build/*.deb
