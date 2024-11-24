@@ -1,8 +1,8 @@
 name: Release Ubuntu Packages
 on:
-  release:
-    types:
-      - created
+  push:
+    tags:
+      - 'v*'
 jobs:
   build:
     uses: paddyoneill/slurm-build-test/.github/workflows/build.yaml@main
@@ -19,10 +19,17 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: ubuntu-debs-${{ matrix.version }}
-          path: build/
+          path: deb/
       - name: List deb packages
-        run: ls -l build/
+        run: ls -l deb/
       - name: Create tar archive of deb packages
-        run: tar -C build/ -cf ubuntu-${{ matrix.version }}-debs.tar.gz *.deb
-      - name: debug
+        run: tar -cf ubuntu-${{ matrix.version }}-debs.tar.gz deb
+      - name: Debug
         run: tar -tvf ubuntu-${{ matrix.version }}-debs.tar.gz
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ubuntu-${{ matrix.version }}-debs.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
