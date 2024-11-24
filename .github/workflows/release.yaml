@@ -1,0 +1,28 @@
+name: Release Ubuntu Packages
+on:
+  release:
+    types: 
+      - created
+jobs:
+  build:
+    uses: paddyoneill/slurm-build-test/.github/workflows/build.yaml@main
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          version:
+            - 22.04
+            - 24.04
+    steps:
+      - name: Fetch build artifacts
+        uses: actions/dowload-artifact@master
+        with:
+          name: ubuntu-debs-${{ matrix.version }}
+          path: build/
+      - name: List deb packages
+        run: ls -l build/
+      - name: Create tar archive of deb packages
+        run: tar -C build/ -cf ubuntu-${{ matrix.version }}-debs.tar.gz *.deb
+      - name: debug
+        run: tar -tvf ubuntu-${{ matrix.version }}-debs.tar.gz
