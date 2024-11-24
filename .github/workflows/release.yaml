@@ -1,7 +1,7 @@
 name: Release Ubuntu Packages
 on:
   release:
-    types: 
+    types:
       - created
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
             - 24.04
     steps:
       - name: Fetch build artifacts
-        uses: actions/dowload-artifact@master
+        uses: actions/download-artifact@master
         with:
           name: ubuntu-debs-${{ matrix.version }}
           path: build/
