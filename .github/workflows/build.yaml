@@ -43,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: rocky-${{ matrix.version }}-rpms
-          path: /root/rpmbuild/RPMS/x86_64/*.rpm
+          path: /github/home/rpmbuild/RPMS/x86_64/*.rpm
