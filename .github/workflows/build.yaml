@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Build Packages
         run: |
-          dnf -y install curl make
+          dnf -y install make
           make rocky-build
       - name: Create build artifact
         uses: actions/upload-artifact@master
