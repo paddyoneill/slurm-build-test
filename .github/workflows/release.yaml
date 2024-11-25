@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     uses: paddyoneill/slurm-build-test/.github/workflows/build.yaml@main
-  release:
+  release-ubuntu:
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -18,18 +18,38 @@ jobs:
       - name: Fetch build artifacts
         uses: actions/download-artifact@master
         with:
-          name: ubuntu-debs-${{ matrix.version }}
+          name: ubuntu-${{ matrix.version }}-debs
           path: deb/
       - name: List deb packages
         run: ls -l deb/
       - name: Create tar archive of deb packages
         run: tar -cf ubuntu-${{ matrix.version }}-debs.tar.gz deb
-      - name: Debug
-        run: tar -tvf ubuntu-${{ matrix.version }}-debs.tar.gz
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             ubuntu-${{ matrix.version }}-debs.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release-rocky:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          version:
+            - 9
+    steps:
+      - name: Fetch build artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: rocky-${{ matrix.version }}-rpms
+          path: rpm/
+      - name: Create tar archive of rpm packages
+        run: tar -cf rocky-${{ matrix.version }}-rpms.tar.gz deb
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            rocky-${{ matrix.version }}-rpms.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -5,7 +5,6 @@ SLURM_MD5SUM ?= 9e3c2bf7b7c0f1a2951881573b3f00d2
 SLURM_TARBALL ?= slurm-$(SLURM_VERSION).tar.bz2
 SLURM_SOURCE ?= https://download.schedmd.com/slurm/$(SLURM_TARBALL)
 
-#HOST_DIR ?= /data
 BUILD_DIR ?= /build
 
 .PHONY: default
@@ -22,14 +21,42 @@ $(SLURM_TARBALL):
 	exit 1; \
 	fi
 
-.PHONY: rocky-build
-rocky-build: fetch-source
+.PHONY: build-rocky
+build-rocky: fetch-source
+	@dnf install https://repo.radeon.com/amdgpu-install/6.2.4/rhel/9.3/amdgpu-install-6.2.60204-1.el9.noarch.rpm
+	@dnf install -y --enablerepo=devel --enablerepo=crb \
+		@Development\ Tools \
+		bzip2-devel \
+		http-parser-devel \
+		hwloc-devel \
+		json-c-devel \
+		libyaml-devel \
+		lua-devel \
+		mariadb-devel \
+		munge-devel \
+		munge-libs \
+		numactl-devel \
+		openssl-devel \
+		pam-devel \
+		perl-ExtUtils-MakeMaker \
+		pmix-devel \
+		procps \
+		readline-devel \
+		rocm-smi-lib \
+		rpm-build \
+		systemd \
+		systemd-rpm-macros
+	@rpmbuild -ta $(BUILD_DIR)/slurm-$(SLURM_TARBALL) \
+		--with mysql \
+		--with hwloc \
+		--with numa \
+		--with pmix \
+		--with slurmrestd \
+		--with lua \
+		--with yaml
 
-.PHONY: rocky-release
-rocky-release: rocky-build
-
-.PHONY: ubuntu-build
-ubuntu-build: fetch-source
+.PHONY: build-ubuntu
+build-ubuntu: fetch-source
 	@apt -y update && apt -y upgrade
 	@ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 	@DEBIAN_FRONTEND=noninteractive apt -y install tzdata
@@ -43,7 +70,3 @@ ubuntu-build: fetch-source
 	@pushd $(BUILD_DIR)/slurm-$(SLURM_VERSION) && \
 		yes | mk-build-deps -i debian/control && \
 		debuild -b -uc -us
-
-.PHONY: ubuntu-release
-ubuntu-release: ubuntu-build
-	@find $(BUILD_DIR) -maxdepth 1 -name '*.deb' -printf '%f\n' | xargs tar -C $(BUILD_DIR) -cf slurm-$(SLURM_VERSION)-ubuntu-$$(lsb_release -sr 2>/dev/null).tar.gz

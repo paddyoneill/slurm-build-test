@@ -1,9 +1,9 @@
-name: Build Ubuntu Packages
+name: Build Slurm Packages
 on:
   push:
   workflow_call:
 jobs:
-  build:
+  ubuntu-build:
     runs-on: ubuntu-latest
     strategy:
         matrix:
@@ -15,15 +15,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: debug
-        run: id
       - name: Build Packages
         run: |
-          id
           apt update && apt -y install curl make
-          make ubuntu-build
+          make build-ubuntu
       - name: Create build artifact
         uses: actions/upload-artifact@master
         with:
-          name: ubuntu-debs-${{ matrix.version }}
+          name: ubuntu-${{ matrix.version }}-debs
           path: /build/*.deb
+  rocky-build:
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          version:
+            - 9
+    container:
+      image: "rockylinux:${{ matrix.version }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build Packages
+        run: |
+          dnf -y install curl make
+          make rocky-build
+      - name: Create build artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: rocky-${{ matrix.version }}-rpms
+          path: /root/rpmbuild/RPMS/x86_64/*.rpm
