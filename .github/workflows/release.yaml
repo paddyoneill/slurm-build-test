@@ -45,7 +45,7 @@ jobs:
           name: rocky-${{ matrix.version }}-rpms
           path: rpm/
       - name: Create tar archive of rpm packages
-        run: tar -cf rocky-${{ matrix.version }}-rpms.tar.gz deb
+        run: tar -cf rocky-${{ matrix.version }}-rpms.tar.gz rpm
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
