@@ -46,7 +46,7 @@ build-rocky: fetch-source
 		rpm-build \
 		systemd \
 		systemd-rpm-macros
-	@rpmbuild -ta $(BUILD_DIR)/slurm-$(SLURM_TARBALL) \
+	@rpmbuild -ta $(BUILD_DIR)/$(SLURM_TARBALL) \
 		--with mysql \
 		--with hwloc \
 		--with numa \
