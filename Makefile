@@ -23,7 +23,7 @@ $(SLURM_TARBALL):
 
 .PHONY: build-rocky
 build-rocky: fetch-source
-	@dnf install https://repo.radeon.com/amdgpu-install/6.2.4/rhel/9.3/amdgpu-install-6.2.60204-1.el9.noarch.rpm
+	@dnf install -y https://repo.radeon.com/amdgpu-install/6.2.4/rhel/9.3/amdgpu-install-6.2.60204-1.el9.noarch.rpm
 	@dnf install -y --enablerepo=devel --enablerepo=crb \
 		@Development\ Tools \
 		bzip2-devel \
