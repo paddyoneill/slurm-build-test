@@ -38,7 +38,7 @@ jobs:
       - name: Build Packages
         run: |
           dnf -y install make
-          make rocky-build
+          make build-rocky
       - name: Create build artifact
         uses: actions/upload-artifact@master
         with:
